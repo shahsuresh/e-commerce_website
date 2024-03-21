@@ -13,27 +13,8 @@ const router = Router();
 
 router.post(
   "/user/register",
-  async (req, res, next) => {
-    // extract date from req.body
+  validateReqBody(registerUserValidationSchema),
 
-    const newUser = req.body;
-
-    // validate User data using validation schema
-
-    try {
-      const validatedData = await registerUserValidationSchema.validate(
-        newUser
-      );
-      req.body = validatedData;
-    } catch (error) {
-      // if validation fails, throw error
-
-      return res.status(400).send({ error: error.message });
-    }
-
-    // call next function
-    next();
-  },
   async (req, res) => {
     // extract new user data from req.body
     const newUser = req.body;
@@ -75,8 +56,10 @@ router.post(
     //extract login data from req.body
 
     const loginData = req.body;
+
     //find user by provided email
     const user = await User.findOne({ email: loginData.email });
+    console.log(user);
 
     //if user does not exist, throw error
     if (!user) {
@@ -85,8 +68,10 @@ router.post(
     // check for password match
 
     const plainPassword = loginData.password;
+
     const hashedPassword = user.password;
-    const isPasswordMatch = bcrypt.compare(plainPassword, hashedPassword);
+
+    const isPasswordMatch = await bcrypt.compare(plainPassword, hashedPassword);
 
     //if not password match, throw error
     if (!isPasswordMatch) {
