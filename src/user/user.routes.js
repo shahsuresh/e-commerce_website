@@ -59,7 +59,6 @@ router.post(
 
     //find user by provided email
     const user = await User.findOne({ email: loginData.email });
-    console.log(user);
 
     //if user does not exist, throw error
     if (!user) {
