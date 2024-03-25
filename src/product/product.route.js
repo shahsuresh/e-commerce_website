@@ -1,8 +1,9 @@
 import express from "express";
-import { isSeller } from "../middlewares/authentication.middleware.js";
+import { isSeller, isUser } from "../middlewares/authentication.middleware.js";
 import validateReqBody from "../middlewares/validation.middleware.js";
 import { newProductValidationSchema } from "./product.validation.js";
 import Product from "./product.model.js";
+import validateMongoIdFromReqParams from "../middlewares/validateMongoID.middleware.js";
 
 const router = express.Router();
 
@@ -32,4 +33,74 @@ router.post(
   }
 );
 
+//?=====get product details===========
+router.get(
+  "/product/details/:id",
+  isUser,
+  validateMongoIdFromReqParams,
+  async (req, res) => {
+    //extract id from req.params
+    const productId = req.params.id;
+
+    //find product
+    const product = await Product.findOne({ _id: productId }).select(
+      "-sellerId"
+    );
+
+    //if not product, throw error
+    if (!product) {
+      return res.status(404).send({ message: "Product does not exist" });
+    }
+
+    //send response
+    return res
+      .status(200)
+      .send({ message: "Success", ProductDetails: product });
+  }
+);
+
+//?========delete product=====
+
+router.delete(
+  "/product/delete/:id",
+  isSeller,
+  validateMongoIdFromReqParams,
+  async (req, res) => {
+    //extract product Id from req.params.id
+    const productId = req.params.id;
+
+    //find product
+    const product = await Product.findById(productId);
+
+    //if not product, throw error
+    if (!product) {
+      return res.status(404).send({ message: "Product does not exist" });
+    }
+
+    //check product ownership
+
+    // To be product owner: product sellerId must be equal to logged in user ID
+
+    const sellerId = product.sellerId;
+    const loggedInUserId = req.loggedInUserId;
+
+    //const isProductOwner = String(sellerId) === String(loggedInUserId)
+    //alternative code
+    const isProductOwner = sellerId.equals(loggedInUserId);
+
+    //if not product owner, throw error
+    if (!isProductOwner) {
+      return res
+        .status(403)
+        .send({ message: "You are not owner of this product" });
+    }
+
+    //delete product
+
+    await Product.deleteOne({ _id: productId });
+
+    //send response
+    return res.status(200).send("Product Deleted Successfully");
+  }
+);
 export default router;
