@@ -110,6 +110,7 @@ router.put(
   "/product/update/:id",
   isSeller,
   validateMongoIdFromReqParams,
+  validateReqBody(newProductValidationSchema),
   async (req, res) => {
     //extract product Id from req.params.id
     const productId = req.params.id;
@@ -141,22 +142,12 @@ router.put(
     //extract product update data from req.body
     const productUpdatedData = req.body;
 
-    //validate productUpdatedData data
-
-    let validatedData;
-
-    try {
-      validatedData = await newProductValidationSchema.validate(
-        productUpdatedData
-      );
-      req.body = validatedData;
-    } catch (error) {
-      //if validation failed, throw error
-      return res.status(400).send({ message: error.message });
-    }
     //update product
 
-    await Product.updateOne({ _id: productId }, { $set: { ...validatedData } });
+    await Product.updateOne(
+      { _id: productId },
+      { $set: { ...productUpdatedData } }
+    );
 
     //send response
     return res.status(200).send({ message: "Product Updated Successfully" });
