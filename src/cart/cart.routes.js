@@ -18,7 +18,7 @@ router.post(
     //extract cart data from req.body
     const cartData = req.body;
 
-    //check product id from mongo id validity
+    //check productId validity i.e productId must be a valid mongoID
     const isValidMongoId = mongoose.isValidObjectId(cartData.productId);
 
     //if not valid mongo id, throw error
@@ -39,27 +39,28 @@ router.post(
         message: "Ordered Quantity is greater than available quantity",
       });
     }
-    //find cart using productId and buyerId
+    // Check, if item is already present in loggedIn user's cart,
+    // find cart using productId and buyerId
     const cartItem = await Cart.findOne({
       buyerId: req.loggedInUserId,
       productId: cartData.productId,
     });
 
-    //if cart item is present
+    // if item is already present in user's cart, show message
+    // Same user cannot add same item in cart more than one time,
+    // but they can increase quantity of that item in his cart
     if (cartItem) {
       return res.status(409).send({
         message:
           "Item is already added to Cart. Try updating quantity from cart menu",
       });
     }
-    //add item to cart
+    // add item to cart
     await Cart.create({
       buyerId: req.loggedInUserId,
       productId: cartData.productId,
       orderedQuantity: cartData.orderedQuantity,
     });
-
-    //
 
     //send response
     return res
@@ -68,7 +69,7 @@ router.post(
   }
 );
 
-//?====Clear Cart=======
+//?====Clear/flush Cart=======
 router.delete("/cart/clear", isBuyer, async (req, res) => {
   const loggedInUserId = req.loggedInUserId;
 
