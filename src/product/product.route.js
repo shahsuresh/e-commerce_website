@@ -103,4 +103,63 @@ router.delete(
     return res.status(200).send("Product Deleted Successfully");
   }
 );
+
+//?=====edit product============
+
+router.put(
+  "/product/update/:id",
+  isSeller,
+  validateMongoIdFromReqParams,
+  async (req, res) => {
+    //extract product Id from req.params.id
+    const productId = req.params.id;
+
+    //find product
+    const product = await Product.findById(productId);
+
+    //if not product, throw error
+    if (!product) {
+      return res.status(404).send({ message: "Product does not exist" });
+    }
+
+    //check product ownership
+
+    // To be product owner: product sellerId must be equal to logged in user ID
+
+    const sellerId = product.sellerId;
+    const loggedInUserId = req.loggedInUserId;
+
+    const isProductOwner = sellerId.equals(loggedInUserId);
+
+    //if not product owner, throw error
+    if (!isProductOwner) {
+      return res
+        .status(403)
+        .send({ message: "You are not owner of this product" });
+    }
+
+    //extract product update data from req.body
+    const productUpdatedData = req.body;
+
+    //validate productUpdatedData data
+
+    let validatedData;
+
+    try {
+      validatedData = await newProductValidationSchema.validate(
+        productUpdatedData
+      );
+      req.body = validatedData;
+    } catch (error) {
+      //if validation failed, throw error
+      return res.status(400).send({ message: error.message });
+    }
+    //update product
+
+    await Product.updateOne({ _id: productId }, { $set: { ...validatedData } });
+
+    //send response
+    return res.status(200).send({ message: "Product Updated Successfully" });
+  }
+);
 export default router;
