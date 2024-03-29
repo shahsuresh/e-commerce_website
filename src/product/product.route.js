@@ -1,7 +1,14 @@
 import express from "express";
-import { isSeller, isUser } from "../middlewares/authentication.middleware.js";
+import {
+  isBuyer,
+  isSeller,
+  isUser,
+} from "../middlewares/authentication.middleware.js";
 import validateReqBody from "../middlewares/validation.middleware.js";
-import { newProductValidationSchema } from "./product.validation.js";
+import {
+  newProductValidationSchema,
+  paginationValidationSchema,
+} from "./product.validation.js";
 import Product from "./product.model.js";
 import validateMongoIdFromReqParams from "../middlewares/validateMongoID.middleware.js";
 
@@ -115,7 +122,7 @@ router.put(
     //extract product Id from req.params.id
     const productId = req.params.id;
 
-    //find product
+    //find product by id
     const product = await Product.findById(productId);
 
     //if not product, throw error
@@ -139,10 +146,10 @@ router.put(
         .send({ message: "You are not owner of this product" });
     }
 
-    //extract product update data from req.body
+    //extract new Values from req.body
     const productUpdatedData = req.body;
 
-    //update product
+    //update/edit product
 
     await Product.updateOne(
       { _id: productId },
@@ -151,6 +158,74 @@ router.put(
 
     //send response
     return res.status(200).send({ message: "Product Updated Successfully" });
+  }
+);
+
+//?=====list product by buyer======
+router.get(
+  "/product/list/buyer",
+  isBuyer,
+  validateReqBody(paginationValidationSchema),
+  async (req, res) => {
+    //extract pagination data from req.body
+    const { page, limit } = req.body;
+
+    //calculate skip and limit
+    const skip = (page - 1) * limit;
+
+    const productList = await Product.aggregate([
+      { $match: {} },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          name: 1,
+          brand: 1,
+          price: 1,
+          category: 1,
+          freeShipping: 1,
+          availableQuantity: 1,
+          description: 1,
+          image: 1,
+        },
+      },
+    ]);
+    if (!productList) {
+      return res.status(404).send({ message: "No Products available now" });
+    }
+    return res.status(200).send({ message: productList });
+  }
+);
+
+//?=====list product by Seller======
+
+router.post(
+  "/product/list/seller",
+  isSeller,
+  validateReqBody(paginationValidationSchema),
+  async (req, res) => {
+    //extract pagination data from req.body
+    const { page, limit } = req.body;
+
+    //calculate skip and limit
+    const skip = (page - 1) * limit;
+    const productList = await Product.aggregate([
+      {
+        $match: { sellerId: req.loggedInUserId },
+      },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          sellerId: 0,
+          createdAt: 0,
+          updatedAt: 0,
+          __v: 0,
+        },
+      },
+    ]);
+
+    return res.status(200).send({ message: productList });
   }
 );
 export default router;
