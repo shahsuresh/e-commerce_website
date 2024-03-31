@@ -20,7 +20,7 @@ export const isSeller = async (req, res, next) => {
   let payload;
   try {
     // verify token
-    payload = jwt.verify(token, "e5b12253701f86a67131");
+    payload = jwt.verify(token, process.env.ACCESS_TOKEN_SIGNATURE);
   } catch (error) {
     return res.status(401).send({ message: "Unauthorized." });
   }
@@ -63,7 +63,7 @@ export const isBuyer = async (req, res, next) => {
   let payload;
   try {
     // verify token
-    payload = jwt.verify(token, "e5b12253701f86a67131");
+    payload = jwt.verify(token, process.env.ACCESS_TOKEN_SIGNATURE);
   } catch (error) {
     return res.status(401).send({ message: "Unauthorized." });
   }
@@ -106,7 +106,7 @@ export const isUser = async (req, res, next) => {
   let payload;
   try {
     // verify token
-    payload = jwt.verify(token, "e5b12253701f86a67131");
+    payload = jwt.verify(token, process.env.ACCESS_TOKEN_SIGNATURE);
   } catch (error) {
     return res.status(401).send({ message: "Unauthorized." });
   }

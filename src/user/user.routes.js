@@ -79,7 +79,7 @@ router.post(
 
     //generate access token
     const payload = { email: user.email };
-    const accessToken = jwt.sign(payload, "e5b12253701f86a67131");
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SIGNATURE);
 
     //to hide password
 

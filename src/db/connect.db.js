@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
-const userName = "suresh";
-const password = encodeURIComponent("suresh1234");
+const userName = process.env.db_USER_NAME;
+const password = encodeURIComponent(process.env.db_PASSWORD);
 
-const dbName = "e-commerce_website";
-const dbURL = `mongodb+srv://${userName}:${password}@cluster0.ke3mn7e.mongodb.net/${dbName}?retryWrites=true&w=majority&appName=Cluster0`;
+const dbName = process.env.db_NAME;
+const dbHost = process.env.db_HOST_NAME;
+const dbURL = `mongodb+srv://${userName}:${password}@${dbHost}/${dbName}?retryWrites=true&w=majority&appName=Cluster0`;
 const connectDB = async () => {
   try {
     await mongoose.connect(dbURL);
