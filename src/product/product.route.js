@@ -162,7 +162,7 @@ router.put(
 );
 
 //?=====list product by buyer======
-router.get(
+router.post(
   "/product/list/buyer",
   isBuyer,
   validateReqBody(paginationValidationSchema),
@@ -193,7 +193,7 @@ router.get(
     if (!productList) {
       return res.status(404).send({ message: "No Products available now" });
     }
-    return res.status(200).send({ message: productList });
+    return res.status(200).send({ productList: productList });
   }
 );
 
@@ -217,15 +217,19 @@ router.post(
       { $limit: limit },
       {
         $project: {
-          sellerId: 0,
-          createdAt: 0,
-          updatedAt: 0,
-          __v: 0,
+          name: 1,
+          price: 1,
+          brand: 1,
+          category: 1,
+          freeShipping: 1,
+          availableQuantity: 1,
+          description: { $substr: ["$description", 0, 200] },
+          image: 1,
         },
       },
     ]);
 
-    return res.status(200).send({ message: productList });
+    return res.status(200).send({ productList: productList });
   }
 );
 export default router;
