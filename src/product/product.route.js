@@ -40,7 +40,7 @@ router.post(
   }
 );
 
-//?=====get product details===========
+//?=====get product details by id===========
 router.get(
   "/product/details/:id",
   isUser,
@@ -62,7 +62,7 @@ router.get(
     //send response
     return res
       .status(200)
-      .send({ message: "Success", ProductDetails: product });
+      .send({ message: "Success", productDetails: product });
   }
 );
 
