@@ -209,10 +209,20 @@ router.get("/cart/item/list", isBuyer, async (req, res) => {
         unitPrice: { $first: "$productDetails.price" },
         image: { $first: "$productDetails.image" },
         orderedQuantity: 1,
+        productId:1
       },
     },
   ]);
 
   return res.status(200).send({ message: "success", cartData: cartData });
 });
+
+//?==========get cart item count===============
+
+router.get("/cart/item/count",isBuyer ,async(req,res)=>{
+  const loggedInUserId = req.loggedInUserId;
+  const cartItemCount = await Cart.find({buyerId:loggedInUserId}).countDocuments();
+  return res.status(200).send({message:"Success",cartItemCount});
+})
+
 export default router;
