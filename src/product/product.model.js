@@ -30,6 +30,8 @@ const productSchema = new mongoose.Schema(
         "kitchen",
         "kids",
         "sports",
+        "fashion",
+        "personal care",
         "auto",
         "clothes",
         "shoes",

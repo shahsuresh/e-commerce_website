@@ -23,6 +23,8 @@ export const newProductValidationSchema = Yup.object({
       "kitchen",
       "kids",
       "sports",
+      "personal care",
+      "auto",
       "auto",
       "clothes",
       "shoes",
