@@ -185,7 +185,7 @@ router.post(
           category: 1,
           freeShipping: 1,
           availableQuantity: 1,
-          description: 1,
+          description: { $substr: ["$description", 0, 200] },
           image: 1,
         },
       },
@@ -193,7 +193,14 @@ router.post(
     if (!productList) {
       return res.status(404).send({ message: "No Products available now" });
     }
-    return res.status(200).send({ productList: productList });
+  // total products count
+  const totalProducts = await Product.find().countDocuments();
+
+  // total pages
+  const totalPage = Math.ceil(totalProducts / limit);
+
+
+    return res.status(200).send({ productList: productList,totalPage });
   }
 );
 
@@ -228,8 +235,15 @@ router.post(
         },
       },
     ]);
+    // calculate page
+    const totalProducts = await Product.find({
+      sellerId: req.loggedInUserId,
+    }).countDocuments();
 
-    return res.status(200).send({ productList: productList });
+    // total page
+    const totalPage = Math.ceil(totalProducts / limit);
+
+    return res.status(200).send({ productList: productList,totalPage });
   }
 );
 export default router;
