@@ -168,13 +168,19 @@ router.post(
   validateReqBody(paginationValidationSchema),
   async (req, res) => {
     //extract pagination data from req.body
-    const { page, limit } = req.body;
+    const { page, limit , searchText } = req.body;
 
     //calculate skip and limit
     const skip = (page - 1) * limit;
 
+    let match = {};
+
+    if (searchText) {
+      match = { name: { $regex: searchText, $options: "i" } };
+    }
+
     const productList = await Product.aggregate([
-      { $match: {} },
+      { $match: match },
       { $skip: skip },
       { $limit: limit },
       {
@@ -194,7 +200,7 @@ router.post(
       return res.status(404).send({ message: "No Products available now" });
     }
   // total products count
-  const totalProducts = await Product.find().countDocuments();
+  const totalProducts = await Product.find(match).countDocuments();
 
   // total pages
   const totalPage = Math.ceil(totalProducts / limit);

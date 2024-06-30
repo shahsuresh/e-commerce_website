@@ -55,4 +55,5 @@ export const paginationValidationSchema = Yup.object({
     .min(1, "Limit must be at least 1.")
     .required("Limit is required.")
     .max(100, "Limit must be at max 100."),
+    searchText: Yup.string().nullable(),
 });
