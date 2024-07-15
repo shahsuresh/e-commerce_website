@@ -107,7 +107,7 @@ router.delete(
     await Product.deleteOne({ _id: productId });
 
     //send response
-    return res.status(200).send("Product Deleted Successfully");
+    return res.status(200).send({ message: "Product Deleted Successfully" });
   }
 );
 
@@ -168,7 +168,7 @@ router.post(
   validateReqBody(paginationValidationSchema),
   async (req, res) => {
     //extract pagination data from req.body
-    const { page, limit , searchText } = req.body;
+    const { page, limit, searchText } = req.body;
 
     //calculate skip and limit
     const skip = (page - 1) * limit;
@@ -199,14 +199,13 @@ router.post(
     if (!productList) {
       return res.status(404).send({ message: "No Products available now" });
     }
-  // total products count
-  const totalProducts = await Product.find(match).countDocuments();
+    // total products count
+    const totalProducts = await Product.find(match).countDocuments();
 
-  // total pages
-  const totalPage = Math.ceil(totalProducts / limit);
+    // total pages
+    const totalPage = Math.ceil(totalProducts / limit);
 
-
-    return res.status(200).send({ productList: productList,totalPage });
+    return res.status(200).send({ productList: productList, totalPage });
   }
 );
 
@@ -249,7 +248,7 @@ router.post(
     // total page
     const totalPage = Math.ceil(totalProducts / limit);
 
-    return res.status(200).send({ productList: productList,totalPage });
+    return res.status(200).send({ productList: productList, totalPage });
   }
 );
 export default router;

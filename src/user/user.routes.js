@@ -42,7 +42,7 @@ router.post(
 
     await User.create(newUser);
     // send response
-    return res.status(201).send({ message: "User Registration Success" });
+    return res.status(201).send({ message: "User Registered Successfully" });
   }
 );
 
@@ -86,9 +86,11 @@ router.post(
     user.password = undefined;
 
     //send response
-    return res
-      .status(200)
-      .send({ message: "Login success", UserDetails: user, accessToken });
+    return res.status(200).send({
+      message: "Welcome" + " " + user.firstName + " " + user.lastName,
+      UserDetails: user,
+      accessToken,
+    });
   }
 );
 //export router
