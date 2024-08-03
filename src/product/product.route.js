@@ -6,6 +6,7 @@ import {
 } from "../middlewares/authentication.middleware.js";
 import validateReqBody from "../middlewares/validation.middleware.js";
 import {
+  listProductByBuyerValidationSchema,
   newProductValidationSchema,
   paginationValidationSchema,
 } from "./product.validation.js";
@@ -165,10 +166,11 @@ router.put(
 router.post(
   "/product/list/buyer",
   isBuyer,
-  validateReqBody(paginationValidationSchema),
+  validateReqBody(listProductByBuyerValidationSchema),
   async (req, res) => {
     //extract pagination data from req.body
-    const { page, limit, searchText } = req.body;
+    const { page, limit, searchText, category, minPrice, maxPrice } = req.body;
+    // console.log({ page, limit, searchText, category, minPrice, maxPrice });
 
     //calculate skip and limit
     const skip = (page - 1) * limit;
@@ -176,7 +178,23 @@ router.post(
     let match = {};
 
     if (searchText) {
-      match = { name: { $regex: searchText, $options: "i" } };
+      match = {
+        $or: [
+          { name: { $regex: searchText, $options: "i" } },
+          { brand: { $regex: searchText, $options: "i" } },
+        ],
+      };
+    }
+    if (category) {
+      match = { ...match, category: category };
+    }
+    if (maxPrice < minPrice) {
+      return res
+        .status(409)
+        .send({ message: "Min Price cannot be greater than Max Price" });
+    }
+    if (minPrice && maxPrice) {
+      match = { ...match, price: { $gte: minPrice, $lte: maxPrice } };
     }
 
     const productList = await Product.aggregate([

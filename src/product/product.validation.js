@@ -55,5 +55,39 @@ export const paginationValidationSchema = Yup.object({
     .min(1, "Limit must be at least 1.")
     .required("Limit is required.")
     .max(100, "Limit must be at max 100."),
-    searchText: Yup.string().nullable(),
+  searchText: Yup.string().nullable(),
+});
+
+// filter product validation schema
+
+export const listProductByBuyerValidationSchema = Yup.object({
+  page: Yup.number()
+    .min(1, "Page must be at least 1.")
+    .required("Page is required."),
+  limit: Yup.number()
+    .min(1, "Limit must be at least 1.")
+    .required("Limit is required.")
+    .max(100, "Limit must be at max 100."),
+  searchText: Yup.string().nullable(),
+  category: Yup.string()
+    .oneOf([
+      "grocery",
+      "electronics",
+      "furniture",
+      "electrical",
+      "kitchen",
+      "kids",
+      "sports",
+      "personal care",
+      "auto",
+      "auto",
+      "clothes",
+      "shoes",
+      "pharmaceuticals",
+      "stationary",
+      "cosmetics",
+    ])
+    .nullable(),
+  minPrice: Yup.number().min(0).nullable(),
+  maxPrice: Yup.number().min(0).nullable(),
 });
