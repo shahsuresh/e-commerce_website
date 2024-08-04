@@ -188,12 +188,12 @@ router.post(
     if (category) {
       match = { ...match, category: category };
     }
-    if (maxPrice < minPrice) {
+    if (minPrice && maxPrice && maxPrice < minPrice) {
       return res
         .status(409)
         .send({ message: "Min Price cannot be greater than Max Price" });
     }
-    if (minPrice && maxPrice) {
+    if (minPrice || maxPrice) {
       match = { ...match, price: { $gte: minPrice, $lte: maxPrice } };
     }
 
