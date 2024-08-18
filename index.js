@@ -3,6 +3,8 @@ import connectDB from "./src/db/connect.db.js";
 import userRoutes from "./src/user/user.routes.js";
 import productRoutes from "./src/product/product.route.js";
 import cartRoutes from "./src/cart/cart.routes.js";
+import khaltiRoutes from "./src/payment-mode/khalti.routes.js";
+import stripeRoutes from "./src/payment-mode/stripe.payments.js";
 import cors from "cors";
 
 const app = express();
@@ -16,8 +18,10 @@ const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
-
-app.use(cors(corsOptions));
+app.use(cors());
+// app.use(cors(corsOptions));
+//======
+app.use(express.urlencoded({ extended: true }));
 
 //?======database connection======
 
@@ -27,6 +31,8 @@ connectDB();
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(cartRoutes);
+app.use(khaltiRoutes);
+app.use(stripeRoutes);
 
 //?===server and PORT======
 const PORT = process.env.PORT || 5000;
