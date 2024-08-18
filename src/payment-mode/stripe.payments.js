@@ -6,15 +6,16 @@ const router = Router();
 
 router.post("/stripe-pay", async (req, res) => {
   const { products } = req.body;
-  //   console.log(products);
-  const lineItems = products?.map((product) => ({
+
+  const lineItems = products.map((product) => ({
     price_data: {
-      currency: "usd",
+      currency: "npr",
       product_data: {
         name: product.name,
+        // ...(product.image ? { images: [image] } : {}),
         // images: [product.image],
       },
-      unit_amount: Number(product.unitPrice * 100),
+      unit_amount: product.unitPrice * 100,
     },
     quantity: product.orderedQuantity,
     // total_details: { amount_discount: 0, amount_shipping: 0, amount_tax: 0 },
@@ -25,8 +26,8 @@ router.post("/stripe-pay", async (req, res) => {
     payment_method_types: ["card"],
     line_items: lineItems,
     mode: "payment",
-    success_url: "http://localhost:5173/home",
-    cancel_url: "http://localhost:5173/cart",
+    success_url: "http://localhost:5173/payment-success",
+    cancel_url: "http://localhost:5173/payment-error",
   });
   //   console.log("SESSION BACKEND", session);
   res.json({ id: session.id });
