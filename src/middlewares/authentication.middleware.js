@@ -57,7 +57,7 @@ export const isBuyer = async (req, res, next) => {
 
   // if not token ,throw error
   if (!token) {
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: "Unauthorized Access" });
   }
 
   let payload;
@@ -76,7 +76,7 @@ export const isBuyer = async (req, res, next) => {
     return res.status(401).send({ message: "Unauthorized." });
   }
 
-  //    user role must be seller
+  //    user role must be buyer
   if (user.role !== "buyer") {
     return res.status(401).send({ message: "Unauthorized." });
   }
