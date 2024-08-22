@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import Cart from "../cart/cart.model.js";
 import orderModel from "./order.model.js";
+import emailSender from "../email/emailSender.js";
 const stripe = Stripe(process.env.STRIPE_SECRET);
 const endpointSecret =
   "whsec_edb3c6a11603d1b2603a74faf397ced1c46a6e22e1f9d3500773674f28f9ea62";
@@ -13,7 +14,7 @@ async function getLIneItems(lineItems) {
     for (const item of lineItems.data) {
       const product = await stripe.products.retrieve(item.price.product);
       const productId = product.metadata.productID;
-      console.log("PRODUCT FROM WEBHOOK", product);
+      // console.log("PRODUCT FROM WEBHOOK", product);
       const productData = {
         productId: productId,
         name: product.name,
@@ -22,7 +23,7 @@ async function getLIneItems(lineItems) {
         image: product.images,
       };
       ProductItems.push(productData);
-      console.log("PRODUCT ITEMS", ProductItems);
+      // console.log("PRODUCT ITEMS", ProductItems);
     }
   }
 
@@ -55,7 +56,7 @@ const webhooks = async (request, response) => {
       const lineItems = await stripe.checkout.sessions.listLineItems(
         session.id
       );
-      console.log("LINEITEMS", lineItems);
+      // console.log("LINEITEMS", lineItems);
 
       const productDetails = await getLIneItems(lineItems);
       const orderDetails = {
@@ -75,7 +76,7 @@ const webhooks = async (request, response) => {
         }),
         totalAmount: session.amount_total / 100,
       };
-      console.log("ORDER DETAILS WEBHOOK", orderDetails);
+      // console.log("ORDER DETAILS WEBHOOK", orderDetails);
       const order = new orderModel(orderDetails);
       const saveOrder = await order.save();
 
@@ -84,9 +85,11 @@ const webhooks = async (request, response) => {
         const deleteCartItem = await Cart.deleteMany({
           buyerId: session.metadata.userId,
         });
-        //TODO: send email to user , containing user order details
       }
-
+      //TODO: send email to user , containing user order details
+      //*========function to send email containing order details to user==========
+      emailSender(orderDetails);
+      //==========================================================================
       break;
     // ... handle other event types
     default:

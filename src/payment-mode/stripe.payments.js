@@ -9,12 +9,12 @@ const router = Router();
 // router.post("/stripe-pay",
 const stripePaymentController = async (req, res) => {
   const { products } = req.body;
-  console.log(products);
+  // console.log(products);
 
   const buyerId = req.loggedInUserId;
   console.log("BUYER ID IS", buyerId);
   const user = await User.findOne({ _id: buyerId });
-  console.log(user);
+  console.log("USER", user);
 
   const lineItems = products.map((product) => ({
     price_data: {

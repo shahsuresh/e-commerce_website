@@ -6,11 +6,11 @@ const router = express.Router();
 router.get("/order-list", isBuyer, async (req, res) => {
   try {
     const userId = req.loggedInUserId;
-    console.log("USERID FROM ORDER ROUTES", userId);
+    // console.log("USERID FROM ORDER ROUTES", userId);
     const orderDetails = await orderModel
       .find({ userId: userId })
       .sort({ createdAt: -1 });
-    console.log("ORDER DETAILS", orderDetails);
+    // console.log("ORDER DETAILS", orderDetails);
 
     if (!orderDetails.length) {
       return res.status(200).send({ message: "No any orders from you" });
