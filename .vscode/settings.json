@@ -20,5 +20,6 @@
   },
   "peacock.color": "#782b42",
   "editor.fontSize": 20,
-  "cSpell.ignoreWords": ["khalti"]
+  "cSpell.ignoreWords": ["khalti"],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

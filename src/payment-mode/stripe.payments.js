@@ -14,7 +14,9 @@ const stripePaymentController = async (req, res) => {
   const buyerId = req.loggedInUserId;
   console.log("BUYER ID IS", buyerId);
   const user = await User.findOne({ _id: buyerId });
-  console.log("USER", user);
+  // console.log("USER", user);
+  // console.log("Success URL:", process.env.STRIPE_SUCCESS_URL);
+  // console.log("Error URL:", process.env.STRIPE_ERROR_URL);
 
   const lineItems = products.map((product) => ({
     price_data: {
@@ -42,8 +44,8 @@ const stripePaymentController = async (req, res) => {
     },
     line_items: lineItems,
     mode: "payment",
-    success_url: "http://localhost:5173/payment-success",
-    cancel_url: "http://localhost:5173/payment-error",
+    success_url: process.env.STRIPE_SUCCESS_URL, //"http://localhost:5173/payment-success",
+    cancel_url: process.env.STRIPE_ERROR_URL, //"http://localhost:5173/payment-error",
   });
   //   console.log("SESSION BACKEND", session);
   res.json({ id: session.id });
