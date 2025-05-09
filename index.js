@@ -25,8 +25,9 @@ const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
 };
-app.use(cors());
-// app.use(cors(corsOptions));
+
+// app.use(cors());
+app.use(cors(corsOptions));
 //======
 app.use(express.urlencoded({ extended: true }));
 
@@ -45,7 +46,7 @@ app.post("/webhook", webhooks); // /api/webhook
 app.use(orderRoutes);
 
 //?===server and PORT======
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running at port:${PORT}`);
 });
